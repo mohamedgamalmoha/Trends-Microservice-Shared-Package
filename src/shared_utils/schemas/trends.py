@@ -24,7 +24,7 @@ class TrendsQuery(pydantic.BaseModel):
     tz: Optional[int] = pydantic.Field(default=0, description="Time zone offset in minutes.")
 
 
-class TaskRetrieve(pydantic.BaseModel):
+class TrendsTask(pydantic.BaseModel):
     task_id: str
     user_id: int
     status: TaskStatus
