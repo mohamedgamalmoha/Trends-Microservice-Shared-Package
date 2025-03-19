@@ -31,5 +31,5 @@ all = [
     "pydantic-settings>=2.8.1",
     "pydantic-core>=2.27.2",
     "python-dotenv>=1.0.1",
-    "email_validator==2.2.0"
+    "email_validator>=2.2.0"
 ]
