@@ -2,8 +2,10 @@
 requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 dependencies = [
-    "setuptools>=42.0",
-    "wheel",
+    "fastapi",
+    "httpx",
+    "pydantic",
+    "pydantic-setting"
 ]
 
 [project]
@@ -19,4 +21,15 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+all = [
+    "fastapi>=0.115.11",
+    "httpx>=0.28.1",
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.8.1",
+    "pydantic-core>=2.27.2",
+    "python-dotenv>=1.0.1",
+    "email_validator==2.2.0"
 ]
