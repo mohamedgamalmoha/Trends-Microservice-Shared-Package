@@ -10,7 +10,7 @@ dependencies = [
 
 [project]
 name = "shared_utils"
-version = "0.0.1"
+version = "0.1.0"
 authors = [
   { name="M.Gamal", email="moha.gamal@nu.edu.eg" },
 ]
