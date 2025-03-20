@@ -21,7 +21,9 @@ dependencies = [
     "httpx",
     "pydantic",
     "pydantic-settings",
-    "email_validator"
+    "email_validator",
+    "SQLAlchemy",
+    "greenlet"
 ]
 
 [project.optional-dependencies]
@@ -32,5 +34,7 @@ all = [
     "pydantic-settings>=2.8.1",
     "pydantic-core>=2.27.2",
     "python-dotenv>=1.0.1",
-    "email_validator>=2.2.0"
+    "email_validator>=2.2.0",
+    "SQLAlchemy>=2.0.39",
+    "greenlet>=3.1.1"
 ]
