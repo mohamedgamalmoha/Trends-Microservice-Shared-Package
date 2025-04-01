@@ -2,6 +2,8 @@ import inspect
 import functools
 from typing import Optional, Any, Callable, Coroutine
 
+import pydantic
+
 
 def safe_call(func: Optional[Callable[..., Coroutine | None]] = None, *,
               on_error: Optional[Callable[[Exception, tuple, dict], Any]] = None) \
@@ -84,3 +86,30 @@ def safe_call(func: Optional[Callable[..., Coroutine | None]] = None, *,
         return decorator  # Return the decorator to be applied later
 
     return decorator(func)  # If `func` is provided, apply the decorator to `func`
+
+
+def validate_pydantic_model_field(
+        model: pydantic.BaseModel,
+        field_name: str,
+        value: Any
+    ) -> None:
+    """
+    Validate a field in a Pydantic model using the Pydantic validator.
+    This function checks if the provided value is valid for the specified field in the model.
+
+    Args:
+        - model: The Pydantic model instance to validate.
+        - field_name: The name of the field to validate.
+        - value: The value to validate.
+
+    Raises:
+        - pydantic_core._pydantic_core.ValidationError: If the value is not valid for the specified field.
+    """
+
+    model.\
+        __pydantic_validator__.\
+        validate_assignment(
+            model.model_construct(),
+            field_name,
+            value
+        )
