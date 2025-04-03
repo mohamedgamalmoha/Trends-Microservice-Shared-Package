@@ -35,6 +35,18 @@ async def close_db() -> None:
     await engine.dispose()
 
 
+@safe_call
+async def drop_db() -> None:
+    """
+    Drops all tables and their data from the database asynchronously.
+    This function uses the Base metadata to drop all defined tables and is wrapped with a safe call decorator.
+
+    Warning: This is a destructive operation that permanently deletes all tables and data.
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
+
 async def get_db() -> AsyncGenerator[AsyncSession | Any, Any]:
     """
     Provides an asynchronous session for database interaction.
