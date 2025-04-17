@@ -15,7 +15,7 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
     for managing SQLAlchemy ORM models using an asynchronous session.
     """
 
-    def __init__(self, db: AsyncSession, model_class: T):
+    def __init__(self, db: AsyncSession):
         """
         Initializes the repository with a database session.
 
