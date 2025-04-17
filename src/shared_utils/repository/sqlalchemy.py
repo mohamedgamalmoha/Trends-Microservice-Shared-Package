@@ -1,4 +1,4 @@
-from typing import Sequence, Optional, Any
+from typing import Sequence, Optional, Any, get_args
 
 from sqlalchemy.sql import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,14 +17,27 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
 
     def __init__(self, db: AsyncSession, model_class: T):
         """
-        Initializes the repository with a database session and model class.
+        Initializes the repository with a database session.
 
         Args:
             - db (AsyncSession): The SQLAlchemy asynchronous session.
-            - model_class (T): The model class to be managed by the repository.
         """
         self.db = db
-        self.model_class = model_class
+
+    @property
+    def model_class(self):
+        """
+        Retrieves the model class associated with the repository.
+
+        This property returns the model class type that the repository is managing.
+        It uses the repository's generic type parameter `T` to determine the model class,
+        which is typically passed when the repository is initialized.
+
+        Returns:
+            - Type[T]: The model class associated with this repository.
+        """
+        orig_base = self.__class__.__orig_bases__[0]
+        return get_args(orig_base)[0]
 
     async def create(self, **kwargs) -> T:
         """
