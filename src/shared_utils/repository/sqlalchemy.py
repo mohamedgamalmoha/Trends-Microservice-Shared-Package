@@ -1,4 +1,4 @@
-from typing import Sequence, Optional, Any, get_args
+from typing import Sequence, Any, get_args
 
 from sqlalchemy.sql import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,6 +69,44 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
         )
         return result.scalars().all()
 
+    async def filter_by(self, **kwargs) -> Sequence[T]:
+        """
+        Retrieves model instances that match the given filtering criteria.
+
+        Args:
+            - **kwargs: Filtering conditions as keyword arguments.
+
+        Returns:
+            - Sequence[T]: A list of matching model instances.
+        """
+        result = await self.db.execute(
+            select(self.model_class).filter_by(**kwargs)
+        )
+        return result.all()
+
+    async def get_by(self, **kwargs) -> T:
+        """
+        Retrieves a single model instance that matches the given filtering criteria.
+
+        Args:
+            - **kwargs: Filtering conditions as keyword arguments.
+
+        Returns:
+            - T: The model instance if found.
+
+        Raises:
+            - ObjDoesNotExist: If no instance is found with the given criteria.
+        """
+        result = await self.db.execute(
+            select(self.model_class).filter_by(**kwargs)
+        )
+
+        result = result.scalar_one_or_none()
+        if not result:
+            raise ObjDoesNotExist
+
+        return result
+
     async def get_by_id(self, id: Any) -> T:
         """
         Retrieves a single model instance by its unique identifier.
@@ -82,30 +120,7 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
         Raises:
             - ObjDoesNotExist: If no instance is found with the given ID.
         """
-        result = await self.db.execute(
-            select(self.model_class).filter_by(id=id)
-        )
-
-        result = result.scalar_one_or_none()
-        if not result:
-            raise ObjDoesNotExist
-
-        return result
-
-    async def filter_by(self, **kwargs) -> Optional[Sequence[T]]:
-        """
-        Retrieves model instances that match the given filtering criteria.
-
-        Args:
-            - **kwargs: Filtering conditions as keyword arguments.
-
-        Returns:
-            - Optional[Sequence[T]]: A list of matching model instances, or None if no match is found.
-        """
-        result = await self.db.execute(
-            select(self.model_class).filter_by(**kwargs)
-        )
-        return result.scalar_one_or_none()
+        result = await self.get_by(id=id)
 
     async def update(self, id: Any, **kwargs) -> T:
         """
