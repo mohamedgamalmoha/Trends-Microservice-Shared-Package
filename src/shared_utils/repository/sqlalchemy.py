@@ -53,7 +53,9 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
         self.db.add(instance)
 
         await self.db.commit()
-        await self.db.refresh(instance)
+
+        if instance is not None:
+            await self.db.refresh(instance)
 
         return instance
 
