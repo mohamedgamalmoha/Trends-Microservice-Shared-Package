@@ -145,7 +145,9 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
                 setattr(obj, field_name, new_field_value)
 
         await self.db.commit()
-        await self.db.refresh(obj)
+
+        if obj is not None:
+            await self.db.refresh(obj)
 
         return obj
 
