@@ -12,8 +12,8 @@ class PageNumberPaginationQueryParams(BaseModel):
     This class defines the parameters required for paginating a query
     using page numbers and sizes.
     """
-    page: Annotated[Optional[int], Field(strict=True, ge=1)] = 1
-    size: Annotated[Optional[int], Field(strict=True, ge=1, le=101)] = 10
+    page: Annotated[Optional[int], Field(ge=1)] = 1
+    size: Annotated[Optional[int], Field(ge=1, le=101)] = 10
 
 
 class PageNumberPaginationResponse[Schema: BaseModel](GenericModel):
