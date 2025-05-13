@@ -1,9 +1,8 @@
-from typing import Sequence, Any, get_args
+from typing import Generic, Sequence, Any, get_args
 
 from sqlalchemy.sql import Select, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 from shared_utils.db.base import Base
 from shared_utils.exceptions import ObjDoesNotExist
 from shared_utils.repository.base import AbstractBaseRepository
@@ -181,7 +180,7 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
         query_params: BaseModel,
         response_schema: Schema,
         **filters
-    ) -> GenericModel[Schema]:
+    ) -> Generic[Schema]:
         """
         Retrieves and returns a paginated response based on the provided filters and query parameters.
 
@@ -196,7 +195,7 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
             - **filters: Arbitrary keyword arguments used to filter the dataset before pagination.
 
         Returns:
-            - GenericModel[Schema]: A paginated response object containing the filtered results and pagination metadata,
+            - Generic[Schema]: A paginated response object containing the filtered results and pagination metadata,
               structured according to the specified `response_schema`.
         """
         filter_query = self.get_filter_query(**filters)
