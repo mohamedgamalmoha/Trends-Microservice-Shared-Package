@@ -124,7 +124,15 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
         Raises:
             - ObjDoesNotExist: If no instance is found with the given ID.
         """
-        result = await self.get_by(id=id)
+        result = await self.db.execute(
+            select(self.model_class).filter_by(id=id)
+        )
+
+        result = result.scalar_one_or_none()
+        if not result:
+            raise ObjDoesNotExist
+
+        return result
 
     def get_filter_query(self, **filters) -> Select:
         """
