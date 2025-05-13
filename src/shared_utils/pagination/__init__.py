@@ -1,1 +1,1 @@
-from shared_utils.pagination import Paginator
+from shared_utils.pagination.base import Paginator
