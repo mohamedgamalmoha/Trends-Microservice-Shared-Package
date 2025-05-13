@@ -87,8 +87,11 @@ class PageNumberPaginator[Model: BaseModel, Schema: BaseModel](
                 results=[],
             )
 
-        next_page = query_params.page + 1 if total_count == query_params.size else None
-        previous_page = query_params.page - 1 if query_params.page > 1 else None
+        page_size = query_params.size
+        current_page = query_params.page
+        total_pages = (total_count + page_size - 1) // page_size if page_size > 0 else 0
+        previous_page = current_page - 1 if current_page > 1 else None
+        next_page = current_page + 1 if current_page < total_pages else None
 
         validated_results = [
             response_schema.model_validate(item) for item in results
