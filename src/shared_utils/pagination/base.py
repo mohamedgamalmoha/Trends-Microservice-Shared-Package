@@ -33,7 +33,7 @@ class Paginator[Model: Base, QueryParams: BaseModel, Schema: BaseModel, Response
     def paginate_response(
         results: Sequence[Model],
         total_count: int,
-        page_params: QueryParams,
+        query_params: QueryParams,
         response_schema: Schema,
     ) -> Response:
         """
@@ -42,7 +42,7 @@ class Paginator[Model: Base, QueryParams: BaseModel, Schema: BaseModel, Response
         Args:
             - results (Sequence[Model]): The results of the paginated query.
             - total_count (int): The total number of items in the query.
-            - page_params (QueryParams): The parameters used for pagination.
+            - query_params (QueryParams): The parameters used for pagination.
             - response_schema (Schema): The schema to format the response.
 
         Returns:
