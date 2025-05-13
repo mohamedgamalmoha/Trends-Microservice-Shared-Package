@@ -1,10 +1,13 @@
 from typing import Sequence, Any, get_args
 
-from sqlalchemy.sql import select
+from sqlalchemy.sql import Select, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel
+from pydantic.generics import GenericModel
 from shared_utils.db.base import Base
 from shared_utils.exceptions import ObjDoesNotExist
 from shared_utils.repository.base import AbstractBaseRepository
+from shared_utils.pagination import Paginator
 
 
 class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
@@ -123,6 +126,98 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
             - ObjDoesNotExist: If no instance is found with the given ID.
         """
         result = await self.get_by(id=id)
+
+    def get_filter_query(self, **filters) -> Select:
+        """
+        Create a filter query for the model.
+
+        Args:
+            - **filters: Filters to apply to the query.
+
+        Returns:
+            - Select: A SQLAlchemy Select object with the applied filters.
+        """
+        return select(
+            self.model_class
+        ).filter_by(
+            **filters
+        )
+
+    async def count_filter_query(self, query: Select) -> int:
+        """
+        Count the number of records that match the given filter query.
+
+        Args:
+            - query (Select): The SQLAlchemy Select object with the applied filters.
+
+        Returns:
+            - int: The count of records that match the filter query.
+        """
+        count_query = select(
+            func.count()
+        ).select_from(
+            query.subquery()
+        )
+
+        result = await self.db.execute(count_query)
+        return int(result.scalar())
+
+    async def execute_filter_query(self, query: Select) -> Sequence[T]:
+        """
+        Execute the given filter query and return the results.
+
+        Args:
+            - query (Select): The SQLAlchemy Select object with the applied filters.
+
+        Returns:
+            - Sequence[T]: A list of filtered model instances.
+        """
+        result = await self.db.execute(query)
+        return result.scalars().all()
+
+    async def get_paginated[Schema: BaseModel](
+        self,
+        paginator: Paginator,
+        query_params: BaseModel,
+        response_schema: Schema,
+        **filters
+    ) -> GenericModel[Schema]:
+        """
+        Retrieves and returns a paginated response based on the provided filters and query parameters.
+
+        This asynchronous method constructs a filtered query using the given filters,
+        counts the total number of matching records, paginates the results using the paginator,
+        executes the query, and returns a paginated response formatted according to the specified schema.
+
+        Args:
+            - paginator (Paginator): A paginator class responsible for applying pagination logic to the query and response.
+            - query_params (BaseModel): Query parameters used to control pagination and other query-related options.
+            - response_schema (Schema): A Pydantic model that defines the structure of the paginated response.
+            - **filters: Arbitrary keyword arguments used to filter the dataset before pagination.
+
+        Returns:
+            - GenericModel[Schema]: A paginated response object containing the filtered results and pagination metadata,
+              structured according to the specified `response_schema`.
+        """
+        filter_query = self.get_filter_query(**filters)
+
+        total_query_count = await self.count_filter_query(filter_query)
+
+        paginated_query = paginator.paginate_query(
+            query=filter_query,
+            query_params=query_params,
+        )
+
+        results = await self.execute_filter_query(query=paginated_query)
+
+        paginated_response = paginator.paginate_response(
+            results=results,
+            total_count=total_query_count,
+            query_params=query_params,
+            response_schema=response_schema
+        )
+
+        return paginated_response
 
     async def update(self, id: Any, **kwargs) -> T:
         """
