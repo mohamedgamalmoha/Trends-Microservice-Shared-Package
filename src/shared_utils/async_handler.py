@@ -13,7 +13,7 @@ class AsyncHandler:
     """
 
     @staticmethod
-    def run_async(coro: Coroutine[Any, Any, T]) -> T:
+    def run_async(coro: Coroutine[Any, Any, T]) -> T | None:
         """
         Run an async coroutine in a new event loop.
 
@@ -21,14 +21,16 @@ class AsyncHandler:
             - coro: The coroutine to run
 
         Returns:
-            - The result of the coroutine
+            - The result of the coroutine, or None in case of failure
         """
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
+        results = None
         try:
-            return loop.run_until_complete(coro)
+            results = loop.run_until_complete(coro)
         finally:
             loop.close()
+        return results
 
     @classmethod
     def sync_to_async(cls, async_handler: Callable[..., Coroutine]):
