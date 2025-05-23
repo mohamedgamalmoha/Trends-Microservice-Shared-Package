@@ -86,7 +86,7 @@ class SQLAlchemyModelRepository[T: Base](AbstractBaseRepository[T]):
         result = await self.db.execute(
             select(self.model_class).filter_by(**kwargs)
         )
-        return result.all()
+        return result.scalars().all()
 
     async def get_by(self, **kwargs) -> T:
         """
